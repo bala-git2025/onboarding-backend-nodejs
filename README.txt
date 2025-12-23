@@ -43,8 +43,7 @@ Notes:
 ## Commands: 
 
 1. Clone the repository:
-git clone <repo-url>
-cd onboarding-backend
+git clone https://github.com/bala-git2025/onboarding-backend-nodejs
 
 2. Install dependencies:
 npm install

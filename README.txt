@@ -52,7 +52,9 @@ npm install
 npm run build
 
 4. Running the Server
-npm start or npm run dev
+npm start
+
+npm run dev -- In dev Environment, it will build and start the server.
 
 
 

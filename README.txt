@@ -25,7 +25,7 @@ DB_HOST=localhost
 DB_PORT=5432
 DB_USER=DB_username
 DB_PASSWORD=password
-DB_NAME=onboarding
+DB_NAME=onboarding 
 
 SQLITE_FILE=./onboarding.sqlite3
 

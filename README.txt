@@ -1,10 +1,10 @@
-# Onboarding Backend details
+# Onboarding Backend details 
 
 This project is a Node.js + Express backend service for managing onboarding workflows.  
 It supports SQLite and PostgreSQL databases, provides REST APIs for employees, tasks, teams, managers
 and health checks, and uses a structured repository/controller pattern.
 
-## Features
+## Features 
 - Express.js server with modular controllers
 - SQLite/Postgres database support via DBManager
 - Centralized response utilities for consistent API responses
@@ -13,7 +13,7 @@ and health checks, and uses a structured repository/controller pattern.
 
 ## Environment Setup
 
-update `.env` file with your credential :
+update `.env` file with your credentials :
 
 #Server
 PORT=5000  #server port

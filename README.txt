@@ -1,4 +1,4 @@
-# Onboarding Backend
+# Onboarding Backend details
 
 This project is a Node.js + Express backend service for managing onboarding workflows.  
 It supports SQLite and PostgreSQL databases, provides REST APIs for employees, tasks, teams, managers

@@ -5,6 +5,7 @@ import logger from './arch-layer/logger/logger';
 // Controllers
 import healthController from './controllers/healthController';
 import employeeController from './controllers/employeeController';
+import taskController from './controllers/taskController'
 
 const app = express();
 
@@ -14,9 +15,10 @@ app.use(express.json());
 // Register controllers
 app.use('/health', healthController);
 app.use('/employees', employeeController);
+app.use('/tasks', taskController);
 
 // Start server
-app.listen(environments.server.port, () => {
+const server=app.listen(environments.server.port, () => {
   const line = '─'.repeat(60);
   console.log(`\n${line}`);
   console.log(`🚀 Server Started`);
@@ -57,4 +59,13 @@ app.listen(environments.server.port, () => {
   console.log(`${line}`);
   console.table(routes);
   console.log(`${line}\n`);
+});
+
+server.on("error",(err:any)=>{
+  console.log(
+    err.code==='EADDRINUSE'
+    ?"Port 5000 is already in use."
+    :`Error: ${err}`
+  );
+  process.exit(1);
 });

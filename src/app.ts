@@ -5,7 +5,8 @@ import logger from './arch-layer/logger/logger';
 // Controllers
 import healthController from './controllers/healthController';
 import employeeController from './controllers/employeeController';
-import taskController from './controllers/taskController'
+import taskController from './controllers/taskController';
+import taskCommentsController from './controllers/taskCommentsController';
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use('/health', healthController);
 app.use('/employees', employeeController);
 app.use('/tasks', taskController);
+app.use('/taskComments', taskCommentsController);
 
 // Start server
 const server=app.listen(environments.server.port, () => {

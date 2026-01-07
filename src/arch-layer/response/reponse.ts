@@ -75,3 +75,11 @@ export function sendDetailedError(
   };
   res.status(statusCode).json(buildResponseBody(statusCode, path, body));
 }
+
+export function send400(res: Response, path: string, errors: ErrorDescription[]) {
+  const body: HttpDetailedErrorResponseBody = {
+    errorDescrList: errors,
+    message: HttpConstants.HTTP_400_BAD_REQUEST || "Bad Request",
+  };
+  res.status(400).json(buildResponseBody(400, path, body));
+}

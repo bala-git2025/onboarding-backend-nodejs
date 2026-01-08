@@ -4,8 +4,7 @@ import {
   SELECT_EMP_BY_ID,
   CREATE_EMP,
   UPDATE_EMP_BY_ID,
-  DELETE_EMP_BY_ID,
-  CREATED_EMP
+  DELETE_EMP_BY_ID
 } from '../common/queries';
 import { Employee } from '../models/employeeModel';
 
@@ -31,44 +30,30 @@ export class EmployeeRepository {
     return employees.length > 0 ? employees[0] : null;
   }
 
-  async createEmployee(employeeData: Partial<Employee>): Promise<Employee> {
-    await this.dbManager.connect();
+async createEmployee(employeeData: Partial<Employee>): Promise<Employee> {
+  await this.dbManager.connect();
 
-    if (!employeeData.name) throw new Error('Employee name is required');
-    if (!employeeData.email) throw new Error('Employee email is required');
+  await this.dbManager.write(CREATE_EMP, [
+    employeeData.teamId,
+    employeeData.name,
+    employeeData.email,
+    employeeData.phone,
+    employeeData.joiningDate,
+    employeeData.primarySkill,
+    employeeData.createdBy,
+    employeeData.updatedBy,
+    employeeData.createdOn,
+    employeeData.updatedOn,
+  ]);
 
-    const now = new Date().toISOString();
+  const createdEmployees = await this.dbManager.query<Employee>('SELECT * FROM Employees WHERE email = ?', [employeeData.email]);
 
-    const employeeToCreate = {
-      ...employeeData,
-      createdOn: employeeData.createdOn || now,
-      updatedOn: employeeData.updatedOn || now,
-      createdBy: employeeData.createdBy || null,
-      updatedBy: employeeData.updatedBy || null,
-    };
-
-    await this.dbManager.write(CREATE_EMP, [
-      employeeToCreate.teamId,
-      employeeToCreate.name,
-      employeeToCreate.email,
-      employeeToCreate.phone,
-      employeeToCreate.joiningDate,
-      employeeToCreate.primarySkill,
-      employeeToCreate.createdBy,
-      employeeToCreate.updatedBy,
-      employeeToCreate.createdOn,
-      employeeToCreate.updatedOn,
-    ]);
-
-    const createdEmployees = await this.dbManager.query<Employee>(CREATED_EMP);
-
-    if (createdEmployees.length === 0) {
-      throw new Error('Failed to create and retrieve the new employee.');
-    }
-
-    return createdEmployees[0];
+  if (createdEmployees.length === 0) {
+    throw new Error('Failed to create and retrieve the new employee.');
   }
 
+  return createdEmployees[0];
+}
   async updateEmployee(
     id: number,
     updateData: Partial<Employee>

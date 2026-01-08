@@ -86,7 +86,6 @@ export class TaskRepository {
   }
 
   async deleteTask(id: number): Promise<boolean> {
-    // FIX: Explicitly connect before any operation
     await this.dbManager.connect();
 
     const existingTask = await this.getTaskById(id);

@@ -26,10 +26,10 @@ router.get('/:id', async (req: Request, res: Response) => {
   try {
     const employeeId = parseInt(req.params.id, 10);
 
-    if (isNaN(employeeId)) {
-      return send404(res, req.path, [{
+    if (isNaN(Number(req.params.id))) {
+      return send400(res, req.path, [{
         fieldName: 'id',
-        type: 'validation',
+        type: 'bad-request',
         description: 'Invalid Employee Id'
       }]);
     }
@@ -40,7 +40,7 @@ router.get('/:id', async (req: Request, res: Response) => {
       return send404(res, req.path, [{
         fieldName: 'id',
         type: 'not-found',
-        description: 'Employee Not Found'
+        description: `Employee Not Found with id ${employeeId}`
       }]);
     }
 
@@ -56,14 +56,32 @@ router.get('/:id', async (req: Request, res: Response) => {
  */
 router.post('/', async (req: Request, res: Response) => {
   try {
-    const { name, email, role } = req.body;
+    const { name, email, joiningDate, primarySkill, teamId, phone } = req.body;
 
-    if (!name || !email || !role) {
-      return send404(res, req.path, [{
-        fieldName: 'name, email, role',
-        type: 'validation',
+    if (!name || !email || !joiningDate || !primarySkill) {
+      return send400(res, req.path, [{
+        fieldName: 'name, email, joiningDate, primarySkill',
+        type: 'bad-request',
         description: 'One or more required fields are missing'
       }]);
+    }
+
+    if (teamId !== undefined && teamId !== null && isNaN(Number(teamId))) {
+      return send400(res, req.path, [{
+        fieldName: 'teamId',
+        type: 'validation',
+        description: 'teamId must be a number.'
+      }]);
+    }
+
+    if (phone !== undefined && phone !== null) {
+      if (!/^\d{10}$/.test(phone)) {
+        return send400(res, req.path, [{
+          fieldName: 'phone',
+          type: 'validation',
+          description: 'phone must be a 10-digit number.'
+        }]);
+      }
     }
 
     const employeeData = {
@@ -77,6 +95,13 @@ router.post('/', async (req: Request, res: Response) => {
     const newEmployee = await employeeRepo.createEmployee(employeeData);
     send201(res, req.path, { employee: newEmployee });
   } catch (err) {
+    if (err instanceof Error && err.message.includes('UNIQUE constraint failed: Employees.email')) {
+      return send400(res, req.path, [{
+        fieldName: 'email',
+        type: 'validation',
+        description: 'An employee with this email already exists.'
+      }]);
+    }
     send500(res, req.path, err as Error);
   }
 });
@@ -92,7 +117,7 @@ router.put('/:id', async (req: Request, res: Response) => {
     if (isNaN(employeeId)) {
       return send400(res, req.path, [{
         fieldName: 'id',
-        type: 'validation',
+        type: 'bad-request',
         description: 'Invalid Employee Id format. Must be a number.'
       }]);
     }
@@ -103,15 +128,37 @@ router.put('/:id', async (req: Request, res: Response) => {
       return send404(res, req.path, [{
         fieldName: 'id',
         type: 'not-found',
-        description: 'Employee Not Found'
+        description: `Employee Not Found with Id:${employeeId}`
       }]);
     }
 
-    const updateData = {
-      ...req.body,
+    const allowedFields = ['teamId', 'name', 'email', 'phone', 'joiningDate', 'primarySkill'];
+    const updateData: any = {
       updatedOn: new Date().toISOString(),
       updatedBy: req.body.updatedBy || (req as any).user?.id || existingEmployee.updatedBy
     };
+
+    for (const field of allowedFields) {
+      if (req.body[field] !== undefined) {
+        if (field === 'teamId' && req.body[field] !== null && isNaN(Number(req.body[field]))) {
+          return send400(res, req.path, [{
+            fieldName: 'teamId',
+            type: 'validation',
+            description: 'teamId must be a number.'
+          }]);
+        }
+
+        if (field === 'phone' && req.body[field] !== null && !/^\d{10}$/.test(req.body[field])) {
+          return send400(res, req.path, [{
+            fieldName: 'phone',
+            type: 'validation',
+            description: 'phone must be a 10-digit number.'
+          }]);
+        }
+
+        updateData[field] = req.body[field];
+      }
+    }
 
     const updatedEmployee = await employeeRepo.updateEmployee(employeeId, updateData);
 
@@ -141,9 +188,9 @@ router.delete('/:id', async (req: Request, res: Response) => {
       }]);
     }
 
-    const deletedEmployee = await employeeRepo.deleteEmployee(employeeId);
+    const deletedEmp = await employeeRepo.deleteEmployee(employeeId);
 
-    if (!deletedEmployee) {
+    if (!deletedEmp) {
       return send404(res, req.path, [{
         fieldName: 'id',
         type: 'not-found',

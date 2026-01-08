@@ -2,8 +2,8 @@ export interface TaskComments{
     id: number;
     comment?: string;
     employeetaskid: number;
-    createdBy?: string;
-    updatedBy?: string;
+    createdBy?: number;
+    updatedBy?: number;
     createdOn?: string;
     updatedOn?: string;
 }

@@ -1,16 +1,26 @@
 export const CHECK_CONN_QUERY = 'SELECT 1';
-export const SELECT_EMP_BY_ID = `SELECT * FROM employee WHERE id = $1`;
-export const CREATE_EMP = 'INSERT INTO employee (name, email) VALUES ($1, $2) RETURNING *';
+
+// TASK QUERIES
+
+// Fetch all the Tasks
 export const FETCH_TASKS = 'SELECT * FROM TASKS';
+
+// Fetch Task by Id
 export const FETCH_TASK_BY_ID = 'SELECT * FROM TASKS WHERE ID=?';
+
+// Create a new Task
 export const CREATE_TASK = `
-  INSERT INTO tasks (name, description, category, createdBy, updatedBy, createdOn, updatedOn)
+  INSERT INTO TASKS (name, description, category, createdBy, updatedBy, createdOn, updatedOn)
   VALUES (?, ?, ?, ?, ?, ?, ?)
   RETURNING *;
 `;
-export const CREATED_TASK = 'SELECT * FROM Tasks ORDER BY id DESC LIMIT 1';
+
+// Fetching the newly created Task (for validation purpose)
+export const CREATED_TASK = 'SELECT * FROM TASKS ORDER BY id DESC LIMIT 1';
+
+// Update the Task by Id
 export const UPDATE_TASK_BY_ID = `
-  UPDATE Tasks 
+  UPDATE TASKS 
   SET 
     name = ?, 
     description = ?, 
@@ -20,29 +30,61 @@ export const UPDATE_TASK_BY_ID = `
   WHERE 
     id = ?
 `;
+
+// Delete a Task
 export const DELETE_TASK_BY_ID = 'DELETE FROM TASKS WHERE ID=?';
+
+// Fetch all Task Comments
 export const FETCH_ALL_TASK_COMMENTS = 'SELECT * FROM TASK_COMMENTS';
 
-
+// Fetch Task comments by Employee Task Id
+export const FETCH_TASK_COMMENTS_BY_ID = `
+  SELECT
+    tc.id AS comment_id,
+    tc.comment,
+    tc.createdOn,
+    et.employeeId,
+    et.status,
+    et.POC
+  FROM
+    Task_Comments AS tc
+  INNER JOIN
+    Employee_Task AS et ON tc.employeetaskId = et.id
+  WHERE
+    et.taskId = ?
+  ORDER BY
+    tc.createdOn DESC;
+`;
 /* =========================
    EMPLOYEE QUERIES
 ========================= */
+// Select employee by Id
+export const SELECT_EMP_BY_ID = `SELECT * FROM employees WHERE id = $1`;
+
+// Creating a new employee
+export const CREATE_EMP = `INSERT INTO Employees (
+    teamId, name, email, phone, joiningDate, primarySkill, 
+    createdBy, updatedBy, createdOn, updatedOn
+  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
 // Fetch all employees
 export const FETCH_EMPLOYEES =
-  'SELECT * FROM employee';
+  'SELECT * FROM employees';
 
 // Fetch last created employee
 export const CREATED_EMP =
-  'SELECT * FROM employee ORDER BY id DESC LIMIT 1';
+  'SELECT * FROM employees ORDER BY id DESC LIMIT 1';
 
 // Update employee by ID
 export const UPDATE_EMP_BY_ID = `
-  UPDATE employee
+  UPDATE Employees
   SET
+    teamId = ?,
     name = ?,
     email = ?,
-    role = ?,
+    phone = ?,
+    joiningDate = ?,
+    primarySkill = ?,
     updatedBy = ?,
     updatedOn = ?
   WHERE
@@ -51,29 +93,7 @@ export const UPDATE_EMP_BY_ID = `
 
 // Delete employee by ID
 export const DELETE_EMP_BY_ID =
-  'DELETE FROM employee WHERE id = ?';
+  'DELETE FROM employees WHERE id = ?';
 
-/* =========================
-   EMPLOYEE COMMENTS
-========================= */
-
-// Fetch comments by employee-task
-export const FETCH_EMPLOYEE_COMMENTS_BY_EMPLOYEE_TASK_ID =
-  'SELECT * FROM employee_comments WHERE employeetaskid = ?';
-
-// Create employee comment
-export const CREATE_EMPLOYEE_COMMENT =
-  `INSERT INTO employee_comments
-   (comment, employeetaskid, createdBy, updatedBy, createdOn, updatedOn)
-   VALUES (?, ?, ?, ?, ?, ?)`;
-
-// Fetch last created employee comment
-export const CREATED_EMPLOYEE_COMMENT =
-  'SELECT * FROM employee_comments ORDER BY id DESC LIMIT 1';
-
-// Delete employee comment by ID
-export const DELETE_EMPLOYEE_COMMENT_BY_ID =
-  'DELETE FROM employee_comments WHERE id = ?';
-
-  export const FETCH_ALL_EMPLOYEE_COMMENTS =
-  'SELECT * FROM employee_comments';
+// Check if employee already exists or not by email
+export const CHECK_EMP='SELECT * FROM Employees WHERE email = ?';

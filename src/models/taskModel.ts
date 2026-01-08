@@ -3,8 +3,8 @@ export interface Task{
     name: string;
     description?: string;
     category?: string;
-    createdBy?: string;
-    updatedBy?: string;
+    createdBy?: number;
+    updatedBy?: number;
     createdOn?: string;
     updatedOn?: string;
 }

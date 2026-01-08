@@ -27,9 +27,9 @@ router.get('/:id', async (req: Request, res: Response) => {
     const taskId = parseInt(req.params.id);
 
     if (isNaN(Number(req.params.id))) {
-      return send404(res, req.path, [{
+      return send400(res, req.path, [{
         fieldName: 'id',
-        type: 'validation',
+        type: 'bad-request',
         description: 'Invalid Task Id'
       }]);
     }
@@ -40,7 +40,7 @@ router.get('/:id', async (req: Request, res: Response) => {
       return send404(res, req.path, [{
         fieldName: 'id',
         type: 'not-found',
-        description: 'Task Not Found'
+        description: `Task Not Found with Id ${taskId}`
       }]);
     }
 
@@ -59,9 +59,9 @@ router.post('/', async (req: Request, res: Response) => {
   try {
     // Validate required fields
     if (!req.body.name || !req.body.description || !req.body.category) {
-      return send404(res, req.path, [{
+      return send400(res, req.path, [{
         fieldName: 'name, description, category',
-        type: 'validation',
+        type: 'bad-request',
         description: 'One or more required fields are missing'
       }]);
     }

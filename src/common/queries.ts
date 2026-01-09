@@ -144,8 +144,8 @@ export const CHECK_EMP='SELECT * FROM Employees WHERE email = ?';
 // Assign task to employee
 export const ASSIGN_TASK_TO_EMPLOYEE = `
   INSERT INTO employee_task
-  (employeeId, taskId, status, poc)
-  VALUES (?, ?, ?, ?)
+  (employeeId, taskId, status, poc, createdBy, updatedBy)
+  VALUES (?, ?, ?, ?, ?, ?)
 `;
 
 // Fetch all tasks of an employee

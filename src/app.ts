@@ -7,6 +7,8 @@ import healthController from './controllers/healthController';
 import employeeController from './controllers/employeeController';
 import taskController from './controllers/taskController';
 import taskCommentsController from './controllers/taskCommentsController';
+import employeeTaskController from './controllers/employeeTaskController';
+
 
 const app = express();
 
@@ -16,8 +18,10 @@ app.use(express.json());
 // Register controllers
 app.use('/health', healthController);
 app.use('/employees', employeeController);
+app.use('/employees', employeeTaskController);
 app.use('/tasks', taskController);
 app.use('/taskComments', taskCommentsController);
+
 
 // Start server
 const server=app.listen(environments.server.port, () => {

@@ -59,7 +59,9 @@ export const FETCH_TASK_COMMENTS_BY_ID = `
    EMPLOYEE QUERIES
 ========================= */
 // Select employee by Id
-export const SELECT_EMP_BY_ID = `SELECT * FROM employees WHERE id = $1`;
+export const SELECT_EMP_BY_ID =
+  'SELECT * FROM employees WHERE id = ?';
+
 
 // Creating a new employee
 export const CREATE_EMP = `INSERT INTO Employees (
@@ -97,3 +99,37 @@ export const DELETE_EMP_BY_ID =
 
 // Check if employee already exists or not by email
 export const CHECK_EMP='SELECT * FROM Employees WHERE email = ?';
+
+
+/* =========================
+   EMPLOYEE ↔ TASK QUERIES
+========================= */
+
+// Assign task to employee
+export const ASSIGN_TASK_TO_EMPLOYEE = `
+  INSERT INTO employee_task
+  (employeeId, taskId, status, poc)
+  VALUES (?, ?, ?, ?)
+`;
+
+// Fetch all tasks of an employee
+export const FETCH_TASKS_BY_EMPLOYEE = `
+  SELECT t.*, et.status, et.poc
+  FROM tasks t
+  JOIN employee_task et ON t.id = et.taskId
+  WHERE et.employeeId = ?
+`;
+
+// Update employee-task mapping
+export const UPDATE_EMPLOYEE_TASK = `
+  UPDATE employee_task
+  SET
+    status = ?,
+    poc = ?
+  WHERE id = ?
+`;
+
+// Remove task from employee
+export const DELETE_EMPLOYEE_TASK = `
+  DELETE FROM employee_task WHERE id = ?
+`;

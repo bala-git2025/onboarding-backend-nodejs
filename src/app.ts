@@ -8,8 +8,11 @@ import employeeController from './controllers/employeeController';
 import taskController from './controllers/taskController';
 import taskCommentsController from './controllers/taskCommentsController';
 import employeeTaskController from './controllers/employeeTaskController';
+<<<<<<< Updated upstream
 
 
+=======
+>>>>>>> Stashed changes
 const app = express();
 
 // Middleware: parse JSON
@@ -21,7 +24,10 @@ app.use('/employees', employeeController);
 app.use('/tasks', taskController);
 app.use('/taskComments', taskCommentsController);
 app.use('/employeeTasks', employeeTaskController);
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 
 // Start server
 const server=app.listen(environments.server.port, () => {

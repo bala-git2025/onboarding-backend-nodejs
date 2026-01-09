@@ -83,3 +83,12 @@ export function send400(res: Response, path: string, errors: ErrorDescription[])
   };
   res.status(400).json(buildResponseBody(400, path, body));
 }
+export const send409 = (res: Response, path: string, errors: any[]) => {
+  res.status(409).json({
+    timestamp: new Date().toISOString(),
+    statusCode: 409,
+    path,
+    message: 'Conflict',
+    errors,
+  });
+};

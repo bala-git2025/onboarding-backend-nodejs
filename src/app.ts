@@ -18,9 +18,9 @@ app.use(express.json());
 // Register controllers
 app.use('/health', healthController);
 app.use('/employees', employeeController);
-app.use('/employees', employeeTaskController);
 app.use('/tasks', taskController);
 app.use('/taskComments', taskCommentsController);
+app.use('/employeeTasks', employeeTaskController);
 
 
 // Start server

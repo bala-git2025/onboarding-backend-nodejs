@@ -53,8 +53,44 @@ export const FETCH_TASK_COMMENTS_BY_ID = `
   WHERE
     et.taskId = ?
   ORDER BY
-    tc.createdOn DESC;
+    tc.createdOn DESC
 `;
+
+// Fetch Employees tasks by task Id
+export const FETCH_EMPLOYEES_BY_TASKID = `
+  SELECT E.*, ET.status, ET.POC, ET.createdBy, ET.updatedBy, ET.createdOn, ET.updatedOn 
+  FROM EMPLOYEE_TASK ET 
+  JOIN EMPLOYEES E ON E.ID = ET.EMPLOYEEID 
+  WHERE ET.TASKID = ?
+`;
+
+// Check if Task exists 
+export const CHECK_TASK_EXISTS = 'SELECT id FROM TASKS WHERE id = ?';
+
+// Query to create a new employee-task assignment
+export const CREATE_EMPLOYEE_TASK_ASSIGNMENT = `
+  INSERT INTO EMPLOYEE_TASK (employeeId, taskId, status, POC, createdBy, updatedBy, createdOn, updatedOn)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+`;
+
+// Query to check if an employee exists
+export const CHECK_EMPLOYEE_EXISTS = 'SELECT id FROM EMPLOYEES WHERE id = ?';
+
+// Query to check if an assignment already exists (to prevent duplicates)
+export const CHECK_ASSIGNMENT_EXISTS = 'SELECT id FROM EMPLOYEE_TASK WHERE taskId = ? AND employeeId = ?';
+
+// Query to fetch the newly created assignment to return it
+export const FETCH_CREATED_ASSIGNMENT = `
+  SELECT 
+    ET.id, ET.employeeId, ET.taskId, ET.status, ET.POC, 
+    ET.createdBy, ET.updatedBy, ET.createdOn, ET.updatedOn,
+    E.name as employeeName,
+    T.name as taskName
+  FROM EMPLOYEE_TASK ET
+  JOIN EMPLOYEES E ON ET.employeeId = E.id
+  JOIN TASKS T ON ET.taskId = T.id
+  WHERE ET.taskId = ? AND ET.employeeId = ?`;
+
 /* =========================
    EMPLOYEE QUERIES
 ========================= */

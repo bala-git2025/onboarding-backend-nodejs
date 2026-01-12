@@ -4,8 +4,10 @@ import {
   SELECT_EMP_BY_ID,
   CREATE_EMP,
   UPDATE_EMP_BY_ID,
-  DELETE_EMP_BY_ID
+  DELETE_EMP_BY_ID,
+  CHECK_EMP
 } from '../common/queries';
+
 import { Employee } from '../models/employeeModel';
 
 export class EmployeeRepository {
@@ -33,20 +35,27 @@ export class EmployeeRepository {
 async createEmployee(employeeData: Partial<Employee>): Promise<Employee> {
   await this.dbManager.connect();
 
+  if (!employeeData.name || !employeeData.email) {
+    throw new Error('Name and email are required');
+  }
+
   await this.dbManager.write(CREATE_EMP, [
-    employeeData.teamId,
+    employeeData.teamId ?? null,
     employeeData.name,
     employeeData.email,
-    employeeData.phone,
-    employeeData.joiningDate,
-    employeeData.primarySkill,
-    employeeData.createdBy,
-    employeeData.updatedBy,
-    employeeData.createdOn,
-    employeeData.updatedOn,
+    employeeData.phone ?? null,
+    employeeData.joiningDate ?? null,
+    employeeData.primarySkill ?? null,
+    employeeData.createdBy ?? null,
+    employeeData.updatedBy ?? null,
+    employeeData.createdOn ?? new Date().toISOString(),
+    employeeData.updatedOn ?? new Date().toISOString(),
   ]);
 
-  const createdEmployees = await this.dbManager.query<Employee>('SELECT * FROM Employees WHERE email = ?', [employeeData.email]);
+  const createdEmployees = await this.dbManager.query<Employee>(
+    CHECK_EMP,
+    [employeeData.email]
+  );
 
   if (createdEmployees.length === 0) {
     throw new Error('Failed to create and retrieve the new employee.');
@@ -54,6 +63,7 @@ async createEmployee(employeeData: Partial<Employee>): Promise<Employee> {
 
   return createdEmployees[0];
 }
+
   async updateEmployee(
     id: number,
     updateData: Partial<Employee>

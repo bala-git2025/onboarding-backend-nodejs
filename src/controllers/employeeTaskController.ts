@@ -1,10 +1,11 @@
 import { Router, Request, Response } from 'express';
 import { EmployeeTaskRepository } from '../repositories/employeeTaskRepository';
-import { send200, send201, send500, send404 } from '../arch-layer/response/reponse';
-import { DBManager } from '../arch-layer/database/dbManager';
+import { send200, send201, send400, send404, send500 } from '../arch-layer/response/reponse';
 
 const router = Router();
 const employeeTaskRepo = new EmployeeTaskRepository();
+
+const isValidId = (v: any) => !isNaN(Number(v));
 
 /**
  * POST /employees/:employeeId/tasks
@@ -14,7 +15,15 @@ router.post('/:employeeId/tasks', async (req: Request, res: Response) => {
     const employeeId = Number(req.params.employeeId);
     const { taskId, status, poc } = req.body;
 
-    await employeeTaskRepo.assignTask(employeeId, taskId, status, poc);
+    if (!isValidId(employeeId) || !isValidId(taskId)) {
+      return send400(res, req.path, [{
+        fieldName: 'employeeId/taskId',
+        type: 'validation',
+        description: 'Invalid employeeId or taskId'
+      }]);
+    }
+
+    await employeeTaskRepo.assignTask(employeeId, Number(taskId), status, poc);
     send201(res, req.path, { message: 'Task assigned to employee' });
   } catch (err) {
     send500(res, req.path, err as Error);
@@ -27,6 +36,15 @@ router.post('/:employeeId/tasks', async (req: Request, res: Response) => {
 router.get('/:employeeId/tasks', async (req: Request, res: Response) => {
   try {
     const employeeId = Number(req.params.employeeId);
+
+    if (!isValidId(employeeId)) {
+      return send400(res, req.path, [{
+        fieldName: 'employeeId',
+        type: 'validation',
+        description: 'Invalid employeeId'
+      }]);
+    }
+
     const tasks = await employeeTaskRepo.getTasksByEmployee(employeeId);
     send200(res, req.path, { tasks });
   } catch (err) {
@@ -43,15 +61,10 @@ router.put('/:employeeId/tasks/:taskId', async (req: Request, res: Response) => 
     const taskId = Number(req.params.taskId);
     const { status, poc } = req.body;
 
-    const dbManager = new DBManager();
-    await dbManager.connect();
+    const employeeTaskId =
+      await employeeTaskRepo.getEmployeeTaskId(employeeId, taskId);
 
-    const rows = await dbManager.query<{ id: number }>(
-      'SELECT id FROM employee_task WHERE employeeId = ? AND taskId = ?',
-      [employeeId, taskId]
-    );
-
-    if (rows.length === 0) {
+    if (!employeeTaskId) {
       return send404(res, req.path, [{
         fieldName: 'employeeTask',
         type: 'not-found',
@@ -59,7 +72,7 @@ router.put('/:employeeId/tasks/:taskId', async (req: Request, res: Response) => 
       }]);
     }
 
-    await employeeTaskRepo.updateEmployeeTask(rows[0].id, status, poc);
+    await employeeTaskRepo.updateEmployeeTask(employeeTaskId, status, poc);
     send200(res, req.path, { message: 'Employee task updated' });
   } catch (err) {
     send500(res, req.path, err as Error);
@@ -74,15 +87,10 @@ router.delete('/:employeeId/tasks/:taskId', async (req: Request, res: Response) 
     const employeeId = Number(req.params.employeeId);
     const taskId = Number(req.params.taskId);
 
-    const dbManager = new DBManager();
-    await dbManager.connect();
+    const employeeTaskId =
+      await employeeTaskRepo.getEmployeeTaskId(employeeId, taskId);
 
-    const rows = await dbManager.query<{ id: number }>(
-      'SELECT id FROM employee_task WHERE employeeId = ? AND taskId = ?',
-      [employeeId, taskId]
-    );
-
-    if (rows.length === 0) {
+    if (!employeeTaskId) {
       return send404(res, req.path, [{
         fieldName: 'employeeTask',
         type: 'not-found',
@@ -90,7 +98,7 @@ router.delete('/:employeeId/tasks/:taskId', async (req: Request, res: Response) 
       }]);
     }
 
-    await employeeTaskRepo.removeEmployeeTask(rows[0].id);
+    await employeeTaskRepo.removeEmployeeTask(employeeTaskId);
     send200(res, req.path, { message: 'Employee task removed' });
   } catch (err) {
     send500(res, req.path, err as Error);

@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from "cors";
 import environments from './arch-layer/config/config';
 import logger from './arch-layer/logger/logger';
 
@@ -16,6 +17,8 @@ const app = express();
 
 // Middleware: parse JSON
 app.use(express.json());
+
+app.use(cors({ origin: "http://localhost:4000",  credentials: true }));
 
 // Register controllers
 app.use('/auth', authController);

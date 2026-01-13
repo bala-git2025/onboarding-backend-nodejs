@@ -3,7 +3,7 @@
 export const CHECK_CONN_QUERY = "SELECT 1";
 
 export const UserQueries = {
-  findByUsername: `
+  findByUserName: `
     SELECT u.id, u.username, u.password, u.roleId, r.name as role
     FROM User u
     JOIN Role r ON u.roleId = r.id

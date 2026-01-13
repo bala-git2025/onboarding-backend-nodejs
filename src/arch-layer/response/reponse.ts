@@ -31,6 +31,14 @@ export function send204(res: Response) {
 }
 
 // Error Responses
+export function send401(res: Response, path: string, err: Error) {
+  res.status(401).json({
+    path,
+    success: false,
+    message: err.message,
+  });
+}
+
 export function send404(res: Response, path: string, errors: ErrorDescription[]) {
   const body: HttpDetailedErrorResponseBody = {
     errorDescrList: errors,

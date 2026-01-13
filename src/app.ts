@@ -9,6 +9,8 @@ import taskController from './controllers/taskController';
 import taskCommentsController from './controllers/taskCommentsController';
 import employeeTaskController from './controllers/employeeTaskController';
 import taskEmployeeController from './controllers/taskEmployeeController';
+import authController from './controllers/authController';
+import { authenticateJWT } from './arch-layer/middleware/authMiddleware';
 
 const app = express();
 
@@ -16,26 +18,38 @@ const app = express();
 app.use(express.json());
 
 // Register controllers
+app.use('/auth', authController);
 app.use('/health', healthController);
-app.use('/employees', employeeController,employeeTaskController);
-app.use('/tasks', taskController,taskEmployeeController);
-app.use('/taskComments', taskCommentsController);
+app.use('/employees', authenticateJWT, employeeController, employeeTaskController); 
+app.use('/tasks', authenticateJWT, taskController, taskEmployeeController); 
+app.use('/taskComments', authenticateJWT, taskCommentsController);
 
+const log: any = logger;
+log.table = (data: any, msg?: string) => {
+  if (msg) {
+    log.info(msg);
+  }
+  if (Array.isArray(data) || typeof data === 'object') {
+    console.table(data); // pretty console output
+  } else {
+    log.info(data);
+  }
+};
 
 // Start server
-const server=app.listen(environments.server.port, () => {
+const server = app.listen(environments.server.port, () => {
   const line = '─'.repeat(60);
-  console.log(`\n${line}`);
-  console.log(`🚀 Server Started`);
-  console.log(`${line}`);
-  console.log(`Environment : ${environments.server.env}`);
-  console.log(`Port        : ${environments.server.port}`);
-  console.log(`Logger      : level=${environments.logger.level}, console=${environments.logger.console}, file=${environments.logger.file}`);
-  console.log(`Database    : type=${environments.db.type}`);
+  log.info(`\n${line}`);
+  log.info(`🚀 Server Started`);
+  log.info(`${line}`);
+  log.info(`Environment : ${environments.server.env}`);
+  log.info(`Port        : ${environments.server.port}`);
+  log.info(`Logger      : level=${environments.logger.level}, console=${environments.logger.console}, file=${environments.logger.file}`);
+  log.info(`Database    : type=${environments.db.type}`);
   if (environments.db.type === 'postgres') {
-    console.log(`   ↳ host=${environments.db.host}, port=${environments.db.port}, user=${environments.db.user}, db=${environments.db.database}`);
+    log.info(`   ↳ host=${environments.db.host}, port=${environments.db.port}, user=${environments.db.user}, db=${environments.db.database}`);
   } else if (environments.db.type === 'sqlite') {
-    console.log(`   ↳ file=${environments.db.sqliteFile}`);
+    log.info(`   ↳ file=${environments.db.sqliteFile}`);
   }
 
   // Print endpoints in table format
@@ -59,18 +73,18 @@ const server=app.listen(environments.server.port, () => {
     }
   });
 
-  console.log(`${line}`);
-  console.log(`📌 Registered Endpoints:`);
-  console.log(`${line}`);
-  console.table(routes);
-  console.log(`${line}\n`);
+  log.info(`${line}`);
+  log.info(`📌 Registered Endpoints:`);
+  log.info(`${line}`);
+  log.table(routes);
+  log.info(`${line}\n`);
 });
 
-server.on("error",(err:any)=>{
-  console.log(
-    err.code==='EADDRINUSE'
-    ?"Port 5000 is already in use."
-    :`Error: ${err}`
+server.on('error', (err: any) => {
+  log.error(
+    err.code === 'EADDRINUSE'
+      ? 'Port 5000 is already in use.'
+      : `Error: ${err}`
   );
   process.exit(1);
 });

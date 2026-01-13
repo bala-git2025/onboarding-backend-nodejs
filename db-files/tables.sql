@@ -1,0 +1,92 @@
+PRAGMA foreign_keys = ON;
+
+-- Role Table
+CREATE TABLE ROLE (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    createdBy TEXT,
+    updatedBy TEXT,
+    createdOn DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updatedOn DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Teams Table
+CREATE TABLE TEAMS (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    description TEXT,
+    createdBy TEXT,
+    updatedBy TEXT,
+    createdOn DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updatedOn DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Employees Table
+CREATE TABLE EMPLOYEES (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    teamId INTEGER,
+    name TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    phone TEXT,
+    joiningDate DATE,
+    primarySkill TEXT,
+    createdBy TEXT,
+    updatedBy TEXT,
+    createdOn DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updatedOn DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (teamId) REFERENCES TEAMS(id)
+);
+
+-- User Table
+CREATE TABLE USER (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    roleId INTEGER,
+    employeeId INTEGER,
+    createdBy TEXT,
+    updatedBy TEXT,
+    createdOn DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updatedOn DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (roleId) REFERENCES ROLE(id),
+    FOREIGN KEY (employeeId) REFERENCES EMPLOYEES(id)
+);
+
+-- Tasks Table
+CREATE TABLE TASKS (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    description TEXT,
+    category TEXT,
+    createdBy TEXT,
+    updatedBy TEXT,
+    createdOn DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updatedOn DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Employee_Task Table
+CREATE TABLE EMPLOYEE_TASK (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    employeeId INTEGER,
+    taskId INTEGER,
+    status TEXT,
+    POC TEXT,
+    createdBy TEXT,
+    updatedBy TEXT,
+    createdOn DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updatedOn DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (employeeId) REFERENCES EMPLOYEES(id),
+    FOREIGN KEY (taskId) REFERENCES TASKS(id)
+);
+
+-- Task_Comments Table
+CREATE TABLE TASK_COMMENTS (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    comment TEXT NOT NULL,
+    employeetaskId INTEGER,
+    createdBy TEXT,
+    updatedBy TEXT,
+    createdOn DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updatedOn DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (employeetaskId) REFERENCES EMPLOYEE_TASK(id)
+);

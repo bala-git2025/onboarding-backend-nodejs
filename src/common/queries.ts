@@ -177,3 +177,32 @@ export const UPDATE_EMPLOYEE_TASK = `
 export const DELETE_EMPLOYEE_TASK = `
   DELETE FROM employee_task WHERE id = ?
 `;
+
+// Get employee list 
+export const GET_TEAM_LIST= `SELECT *
+FROM TEAMS AS TEAM
+INNER JOIN EMPLOYEES AS EMP
+  ON TEAM.ID = EMP.TEAMID
+INNER JOIN EMPLOYEE_TASK AS EMPTSK
+  ON EMP.ID = EMPTSK.EMPLOYEEID`;
+
+export const GET_TEAM_DETAILS = `SELECT 
+    employees.id AS id,
+    employees.name AS name,
+    employeeTask.status AS status,
+    teams.name as TeamName,
+    tasks.name as TaskName
+FROM EMPLOYEES employees
+JOIN EMPLOYEE_TASK employeeTask 
+ON employees.id = employeeTask.employeeId
+JOIN TEAMS teams
+ON teams.id = employees.teamId
+JOIN TASKS tasks
+ON  tasks.id = employees.id
+WHERE employees.teamId = ?`;
+
+
+export  const CREATE_EMPLOYEE_TASK = `INSERT INTO employee_task ( employeeid, taskid, status, poc, createdby, updatedby, createdOn, updatedOn )
+ VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING *`;
+
+export const CHECK_EMPLOYEE = `SELECT * FROM EMPLOYEE_TASK WHERE EMPLOYEEID = ? `;

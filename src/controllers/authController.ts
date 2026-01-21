@@ -35,16 +35,18 @@ router.post('/login', async (req, res) => {
       { expiresIn: '1h' }
     );
 
-    send200(res, req.path, {
+    const responsePayload = {
       token,
       role: user.role,
-      userName: user.userName
-    });
+      userName: user.userName,
+      employeeId: user.employeeId
+    };
+
+    send200(res, req.path, responsePayload);
   } catch (err) {
     send500(res, req.path, err as Error);
   }
 });
-
 /**
  * POST /auth/register
  */

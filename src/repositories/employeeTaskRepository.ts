@@ -1,9 +1,12 @@
+// employeeTaskRepository.ts
 import { DBManager } from '../arch-layer/database/dbManager';
 import {
   ASSIGN_TASK_TO_EMPLOYEE,
   FETCH_TASKS_BY_EMPLOYEE,
   UPDATE_EMPLOYEE_TASK,
-  DELETE_EMPLOYEE_TASK
+  DELETE_EMPLOYEE_TASK,
+  FETCH_EMPLOYEE_TASK_DETAIL,
+  ADD_COMMENT_TO_TASK
 } from '../common/queries';
 
 export interface EmployeeTask {
@@ -65,6 +68,30 @@ export class EmployeeTaskRepository {
       FETCH_TASKS_BY_EMPLOYEE,
       [employeeId]
     );
+  }
+
+  // Get specific task detail for employee
+  async getEmployeeTaskDetail(employeeId: number, taskId: number): Promise<any> {
+    await this.dbManager.connect();
+    const rows = await this.dbManager.query<any>(
+        FETCH_EMPLOYEE_TASK_DETAIL,
+        [employeeId, taskId]
+    );
+    return rows.length > 0 ? rows[0] : null;
+  }
+
+  // Add comment
+  async addComment(employeeTaskId: number, comment: string, userId: number | null): Promise<void> {
+    await this.dbManager.connect();
+    const now = new Date().toISOString();
+    await this.dbManager.write(ADD_COMMENT_TO_TASK, [
+        comment,
+        employeeTaskId,
+        userId,
+        userId,
+        now,
+        now
+    ]);
   }
 
   //  Update mapping

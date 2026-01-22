@@ -1,6 +1,6 @@
 import { DBManager } from "../arch-layer/database/dbManager";
 import { teamModel } from "../models/teamModel";
-import { GET_TEAM_LIST, GET_TEAM_DETAILS, CREATE_EMPLOYEE_TASK, CHECK_TASK_EXISTS, CHECK_EMPLOYEE } from "../common/queries";
+import { GET_TEAM_LIST, GET_TEAM_DETAILS, CREATE_EMPLOYEE_TASK, CHECK_TASK_EXISTS } from "../common/queries";
 import { EmployeeTask } from "../models/employeeTaskModel";
 
 
@@ -25,16 +25,16 @@ export class ManagerRepository {
 
 
     async createTask(employeeTaskData: Partial<EmployeeTask>): Promise<EmployeeTask> {
-        
+
         await this.dbManager.connect();
-        
+
         if (!employeeTaskData.employeeId || !employeeTaskData.taskId) {
             throw new Error('EmployeeId and task Id are required');
         }
-  
-      const [createdTask] =   await this.dbManager.excuteWriteReturn(CREATE_EMPLOYEE_TASK, [
-            employeeTaskData.employeeId?? null,
-            employeeTaskData.taskId?? null,
+
+        const [createdTask] = await this.dbManager.excuteWriteReturn(CREATE_EMPLOYEE_TASK, [
+            employeeTaskData.employeeId ?? null,
+            employeeTaskData.taskId ?? null,
             employeeTaskData.status,
             employeeTaskData.poc,
             employeeTaskData.createdBy ?? null,
@@ -43,8 +43,8 @@ export class ManagerRepository {
             employeeTaskData.updatedOn ?? new Date().toISOString(),
         ]);
 
-       
-        console.log('Created Task:',createdTask);
+
+
         if (!createdTask) {
             throw new Error('Failed to create and retrieve the new employee.');
         }

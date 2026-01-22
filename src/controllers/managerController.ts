@@ -86,7 +86,7 @@ router.put('/addTask', async (req: Request, res: Response) => {
         if (err instanceof Error && err.message.includes('UNIQUE constraint failed: Employees.email')) {
             return send400(res, req.path, [{
                 fieldName: 'email',
-                type: 'validation',
+                type: 'validation' ,
                 description: 'An employee with this email already exists.'
             }]);
         }

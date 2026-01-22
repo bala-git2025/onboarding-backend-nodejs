@@ -11,6 +11,7 @@ import taskCommentsController from './controllers/taskCommentsController';
 import employeeTaskController from './controllers/employeeTaskController';
 import taskEmployeeController from './controllers/taskEmployeeController';
 import authController from './controllers/authController';
+import managerController from './controllers/managerController';
 import { authenticateJWT } from './arch-layer/middleware/authMiddleware';
 
 const app = express();
@@ -26,6 +27,7 @@ app.use('/health', healthController);
 app.use('/employees', authenticateJWT, employeeController, employeeTaskController); 
 app.use('/tasks', authenticateJWT, taskController, taskEmployeeController); 
 app.use('/taskComments', authenticateJWT, taskCommentsController);
+app.use('/manager', authenticateJWT, managerController);
 
 const log: any = logger;
 log.table = (data: any, msg?: string) => {

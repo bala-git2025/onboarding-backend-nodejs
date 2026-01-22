@@ -47,4 +47,14 @@ export class DBManager {
     }
     throw new Error('No database configured');
   }
+
+ public async excuteWriteReturn<T>(sql: string, params: any[] = []): Promise<T[]> {
+    if(this.sqlite) {
+      return this.sqlite.excuteWriteReturning<T>(sql, params);
+    }
+    throw new Error('No database configured');
+  }
+
 }
+
+

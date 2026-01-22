@@ -6,7 +6,7 @@ import logger from '../logger/logger';
 export class SqliteManager {
   private db: Database | null = null;
 
-  constructor() {}
+  constructor() { }
 
   public async connect(): Promise<void> {
     try {
@@ -45,6 +45,17 @@ export class SqliteManager {
       return [];
     } catch (err) {
       logger.error('❌ SQLite write failed: %o', err);
+      throw err;
+    }
+  }
+
+  public async excuteWriteReturning<T>(query: string, params: any[] = []): Promise<T[]> {
+    if (!this.db) throw new Error('SQLite not connected');
+    try {
+      const result = await this.db.all<T[]>(query, params);
+      return result;
+    } catch (err) {
+      logger.error('❌ SQLite write returning failed: %o', err);
       throw err;
     }
   }

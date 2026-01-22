@@ -53,6 +53,37 @@ router.get('/:employeeId/tasks', async (req: Request, res: Response) => {
 });
 
 /**
+ * GET /employees/:employeeId/tasks/:taskId
+ */
+router.get('/:employeeId/tasks/:taskId', async (req: Request, res: Response) => {
+  try {
+    const employeeId = Number(req.params.employeeId);
+    const taskId = Number(req.params.taskId);
+
+    if (!isValidId(employeeId) || !isValidId(taskId)) {
+      return send400(res, req.path, [{
+        fieldName: 'employeeId/taskId',
+        type: 'validation',
+        description: 'Invalid employeeId or taskId'
+      }]);
+    }
+
+    const task = await employeeTaskRepo.getEmployeeTaskDetail(employeeId, taskId);
+    if (!task) {
+        return send404(res, req.path, [{
+            fieldName: 'task',
+            type: 'not-found',
+            description: 'Task assignment not found'
+        }]);
+    }
+
+    send200(res, req.path, { task });
+  } catch (err) {
+    send500(res, req.path, err as Error);
+  }
+});
+
+/**
  * PUT /employees/:employeeId/tasks/:taskId
  */
 router.put('/:employeeId/tasks/:taskId', async (req: Request, res: Response) => {
@@ -74,6 +105,34 @@ router.put('/:employeeId/tasks/:taskId', async (req: Request, res: Response) => 
 
     await employeeTaskRepo.updateEmployeeTask(employeeTaskId, status, poc);
     send200(res, req.path, { message: 'Employee task updated' });
+  } catch (err) {
+    send500(res, req.path, err as Error);
+  }
+});
+
+/**
+ * POST /employees/:employeeId/tasks/:taskId/comments
+ */
+router.post('/:employeeId/tasks/:taskId/comments', async (req: Request, res: Response) => {
+  try {
+    const employeeId = Number(req.params.employeeId);
+    const taskId = Number(req.params.taskId);
+    const { comment } = req.body;
+
+    const employeeTaskId = await employeeTaskRepo.getEmployeeTaskId(employeeId, taskId);
+
+    if (!employeeTaskId) {
+      return send404(res, req.path, [{
+        fieldName: 'employeeTask',
+        type: 'not-found',
+        description: 'Employee task mapping not found'
+      }]);
+    }
+
+    const userId = (req as any).user?.id || null;
+    await employeeTaskRepo.addComment(employeeTaskId, comment, userId);
+    
+    send201(res, req.path, { message: 'Comment added' });
   } catch (err) {
     send500(res, req.path, err as Error);
   }

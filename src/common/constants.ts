@@ -15,3 +15,14 @@ export enum HttpStatusCode {
     BadRequest = 400,
     InternalServerError = 500,
   }
+
+export const DEFAULT_EMPLOYEE_DATA = {
+  teamId: null,
+  name: 'John Anderson',
+  email: 'john.anderson@company.com',
+  phone: null,
+  joiningDate: '2023-01-15',
+  primarySkill: 'Full Stack Development',
+  createdBy: null,
+  updatedBy: null
+};

@@ -3,10 +3,13 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { send200, send201, send401, send500 } from '../arch-layer/response/reponse';
 import { UserRepository } from '../repositories/userRepository';
+import { EmployeeRepository } from '../repositories/employeeRepository';
 import { User } from '../models/userModel';
+import { Employee } from '../models/employeeModel';
 
 const router = Router();
 const userRepo = new UserRepository();
+const employeeRepo = new EmployeeRepository();
 const SECRET_KEY = process.env.JWT_SECRET || 'super_secret_key';
 
 /**
@@ -22,10 +25,20 @@ router.post('/login', async (req, res) => {
       return send401(res, req.path, new Error('Invalid credentials'));
     }
 
-    // Compare hashed password
+    if (!user.employeeId) {
+      return send401(res, req.path, new Error('User account is not associated with an employee.'));
+    }
+
+        // Compare hashed password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return send401(res, req.path, new Error('Invalid credentials'));
+    }
+
+    const employee: Employee | null = await employeeRepo.getEmployeeById(user.employeeId);
+
+    if (!employee) {
+      return send500(res, req.path, new Error('Associated employee record not found.'));
     }
 
     // Generate JWT
@@ -39,7 +52,8 @@ router.post('/login', async (req, res) => {
       token,
       role: user.role,
       userName: user.userName,
-      employeeId: user.employeeId
+      employeeId: user.employeeId,
+      employeeName: employee.name
     };
 
     send200(res, req.path, responsePayload);
@@ -47,6 +61,7 @@ router.post('/login', async (req, res) => {
     send500(res, req.path, err as Error);
   }
 });
+
 /**
  * POST /auth/register
  */
@@ -62,10 +77,8 @@ router.post('/register', async (req, res) => {
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
-
     // Default role assignment: Employee if not provided
     const assignedRoleId = roleId || 1; // assuming Role table has 1 = Employee
-
     // Create user
     const newUser = await userRepo.createUser(userName, hashedPassword, assignedRoleId);
 

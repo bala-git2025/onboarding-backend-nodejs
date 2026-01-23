@@ -37,15 +37,8 @@ router.get('/:id', async (req: Request, res: Response) => {
     const taskId = parseInt(taskIdStr, 10);
     const taskComments = await taskComRepo.getTaskCommentsByTaskId(taskId);
 
-    if (!taskComments || taskComments.length === 0) {
-      return send404(res, req.path, [{
-        fieldName: 'id',
-        type: 'not-found',
-        description: `No comments found for task with Id: ${taskId}`
-      }]);
-    }
+    send200(res, req.path, { taskComments: taskComments || [] });
 
-    send200(res, req.path, { taskComments });
   } catch (err) {
     send500(res, req.path, err as Error);
   }

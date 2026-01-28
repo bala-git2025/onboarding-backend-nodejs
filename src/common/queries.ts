@@ -66,7 +66,8 @@ export const FETCH_TASK_COMMENTS_BY_ID = `
     tc.createdOn,
     et.employeeId,
     et.status,
-    et.POC
+    et.POC,
+    et.dueDate
   FROM
     Task_Comments AS tc
   INNER JOIN
@@ -79,10 +80,15 @@ export const FETCH_TASK_COMMENTS_BY_ID = `
  
 // Fetch Employees tasks by task Id
 export const FETCH_EMPLOYEES_BY_TASKID = `
-  SELECT E.*, ET.status, ET.POC, ET.createdBy, ET.updatedBy, ET.createdOn, ET.updatedOn
-  FROM EMPLOYEE_TASK ET
-  JOIN EMPLOYEES E ON E.ID = ET.EMPLOYEEID
-  WHERE ET.TASKID = ?
+  SELECT 
+    T.*, 
+    ET.status, 
+    ET.POC, 
+    ET.id as employeeTaskId,
+    ET.dueDate
+  FROM TASKS T
+  JOIN EMPLOYEE_TASK ET ON T.id = ET.taskId
+  WHERE ET.employeeId = ? AND ET.taskId = ?
 `;
  
 // Check if Task exists
@@ -166,7 +172,7 @@ export const ASSIGN_TASK_TO_EMPLOYEE = `
  
 // Fetch all tasks of an employee
 export const FETCH_TASKS_BY_EMPLOYEE = `
-  SELECT t.*, et.status, et.poc
+  SELECT t.*, et.status, et.poc, et.dueDate
   FROM tasks t
   JOIN employee_task et ON t.id = et.taskId
   WHERE et.employeeId = ?
@@ -216,7 +222,12 @@ export  const CREATE_EMPLOYEE_TASK = `INSERT INTO employee_task ( employeeid, ta
 export const CHECK_EMPLOYEE = `SELECT * FROM EMPLOYEE_TASK WHERE EMPLOYEEID = ? `;
 // Fetch specific task detail for an employee
 export const FETCH_EMPLOYEE_TASK_DETAIL = `
-  SELECT T.*, ET.status, ET.POC, ET.id as employeeTaskId
+  SELECT 
+    T.*, 
+    ET.status, 
+    ET.POC, 
+    ET.id as employeeTaskId,
+    ET.dueDate
   FROM TASKS T
   JOIN EMPLOYEE_TASK ET ON T.id = ET.taskId
   WHERE ET.employeeId = ? AND ET.taskId = ?

@@ -1,10 +1,10 @@
-export interface EmployeeTask{
+export interface EmployeeTask {
     id: number;
     employeeId: number;
     taskId: number;
     status: string;
     poc: string;
-    dueDate: Date;
+    dueDate: string | null;
     createdBy?: number;
     updatedBy?: number;
     createdOn?: string;

@@ -1,6 +1,8 @@
 // Central place for SQL queries
 
+
 export const CHECK_CONN_QUERY = "SELECT 1";
+
 
 export const UserQueries = {
   findByUserName: `
@@ -116,6 +118,7 @@ export const UPDATE_TASK_BY_ID = `
   WHERE id = ?
 `;
 
+
 // Delete a Task
 export const DELETE_TASK_BY_ID = "DELETE FROM Tasks WHERE id = ?";
 
@@ -138,6 +141,7 @@ export const FETCH_TASK_COMMENTS_BY_ID = `
   ORDER BY tc.createdOn DESC
 `;
 
+
 // Fetch Employees tasks by task Id
 export const FETCH_EMPLOYEES_BY_TASKID = `
   SELECT 
@@ -150,6 +154,7 @@ export const FETCH_EMPLOYEES_BY_TASKID = `
   JOIN Employee_Task ET ON T.id = ET.taskId
   WHERE ET.employeeId = ? AND ET.taskId = ?
 `;
+
 
 // Check if Task exists
 export const CHECK_TASK_EXISTS = "SELECT id FROM Tasks WHERE id = ?";
@@ -216,15 +221,18 @@ export const UPDATE_EMP_BY_ID = `
   WHERE id = ?
 `;
 
+
 // Delete employee by ID
 export const DELETE_EMP_BY_ID = "DELETE FROM Employees WHERE id = ?";
 
 // Check if employee already exists by email
 export const CHECK_EMP = "SELECT * FROM Employees WHERE email = ?";
 
+
 /* =========================
    EMPLOYEE ↔ TASK QUERIES
 ========================= */
+
 
 // Assign task to employee
 export const ASSIGN_TASK_TO_EMPLOYEE = `
@@ -232,6 +240,7 @@ export const ASSIGN_TASK_TO_EMPLOYEE = `
   (employeeId, taskId, status, POC, createdBy, updatedBy)
   VALUES (?, ?, ?, ?, ?, ?)
 `;
+
 
 // Fetch all tasks of an employee
 export const FETCH_TASKS_BY_EMPLOYEE = `
@@ -241,6 +250,7 @@ export const FETCH_TASKS_BY_EMPLOYEE = `
   WHERE et.employeeId = ?
 `;
 
+
 // Update employee-task mapping
 export const UPDATE_EMPLOYEE_TASK = `
   UPDATE Employee_Task
@@ -249,6 +259,7 @@ export const UPDATE_EMPLOYEE_TASK = `
     POC = ?
   WHERE id = ?
 `;
+
 
 // Remove task from employee
 export const DELETE_EMPLOYEE_TASK = "DELETE FROM Employee_Task WHERE id = ?";
@@ -299,6 +310,7 @@ export const FETCH_EMPLOYEE_TASK_DETAIL = `
   JOIN Employee_Task ET ON T.id = ET.taskId
   WHERE ET.employeeId = ? AND ET.taskId = ?
 `;
+
 
 // Add comment to an employee task
 export const ADD_COMMENT_TO_TASK = `

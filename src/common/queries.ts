@@ -1,7 +1,7 @@
 // Central place for SQL queries
- 
+
 export const CHECK_CONN_QUERY = "SELECT 1";
- 
+
 export const UserQueries = {
   findByUserName: `
     SELECT
@@ -18,27 +18,27 @@ export const UserQueries = {
   insertUser: ` INSERT INTO User (username, password, roleId)
   VALUES (?, ?, ?) RETURNING id, username, roleId `,
 };
- 
+
 export const UPDATE_USER_EMPLOYEE_ID = "UPDATE USER SET employeeId = ? WHERE id = ?";
- 
+
 // TASK QUERIES
- 
+
 // Fetch all the Tasks
 export const FETCH_TASKS = "SELECT * FROM TASKS";
- 
+
 // Fetch Task by Id
 export const FETCH_TASK_BY_ID = "SELECT * FROM TASKS WHERE ID=?";
- 
+
 // Create a new Task
 export const CREATE_TASK = `
   INSERT INTO TASKS (name, description, category, createdBy, updatedBy, createdOn, updatedOn)
   VALUES (?, ?, ?, ?, ?, ?, ?)
   RETURNING *;
 `;
- 
+
 // Fetching the newly created Task (for validation purpose)
 export const CREATED_TASK = "SELECT * FROM TASKS ORDER BY id DESC LIMIT 1";
- 
+
 // Update the Task by Id
 export const UPDATE_TASK_BY_ID = `
   UPDATE TASKS
@@ -51,13 +51,13 @@ export const UPDATE_TASK_BY_ID = `
   WHERE
     id = ?
 `;
- 
+
 // Delete a Task
 export const DELETE_TASK_BY_ID = "DELETE FROM TASKS WHERE ID=?";
- 
+
 // Fetch all Task Comments
 export const FETCH_ALL_TASK_COMMENTS = "SELECT * FROM TASK_COMMENTS";
- 
+
 // Fetch Task comments by Employee Task Id
 export const FETCH_TASK_COMMENTS_BY_ID = `
   SELECT
@@ -77,7 +77,7 @@ export const FETCH_TASK_COMMENTS_BY_ID = `
   ORDER BY
     tc.createdOn DESC
 `;
- 
+
 // Fetch Employees tasks by task Id
 export const FETCH_EMPLOYEES_BY_TASKID = `
   SELECT 
@@ -90,23 +90,23 @@ export const FETCH_EMPLOYEES_BY_TASKID = `
   JOIN EMPLOYEE_TASK ET ON T.id = ET.taskId
   WHERE ET.employeeId = ? AND ET.taskId = ?
 `;
- 
+
 // Check if Task exists
 export const CHECK_TASK_EXISTS = "SELECT id FROM TASKS WHERE id = ?";
- 
+
 // Query to create a new employee-task assignment
 export const CREATE_EMPLOYEE_TASK_ASSIGNMENT = `
   INSERT INTO EMPLOYEE_TASK (employeeId, taskId, status, POC, createdBy, updatedBy, createdOn, updatedOn)
   VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 `;
- 
+
 // Query to check if an employee exists
 export const CHECK_EMPLOYEE_EXISTS = "SELECT id FROM EMPLOYEES WHERE id = ?";
- 
+
 // Query to check if an assignment already exists (to prevent duplicates)
 export const CHECK_ASSIGNMENT_EXISTS =
   "SELECT id FROM EMPLOYEE_TASK WHERE taskId = ? AND employeeId = ?";
- 
+
 // Query to fetch the newly created assignment to return it
 export const FETCH_CREATED_ASSIGNMENT = `
   SELECT
@@ -118,25 +118,25 @@ export const FETCH_CREATED_ASSIGNMENT = `
   JOIN EMPLOYEES E ON ET.employeeId = E.id
   JOIN TASKS T ON ET.taskId = T.id
   WHERE ET.taskId = ? AND ET.employeeId = ?`;
- 
+
 /* =========================
    EMPLOYEE QUERIES
 ========================= */
 // Select employee by Id
 export const SELECT_EMP_BY_ID = "SELECT * FROM employees WHERE id = ?";
- 
+
 // Creating a new employee
 export const CREATE_EMP = `INSERT INTO Employees (
     teamId, name, email, phone, joiningDate, primarySkill,
     createdBy, updatedBy, createdOn, updatedOn
   ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
- 
+
 // Fetch all employees
 export const FETCH_EMPLOYEES = "SELECT * FROM employees";
- 
+
 // Fetch last created employee
 export const CREATED_EMP = "SELECT * FROM employees ORDER BY id DESC LIMIT 1";
- 
+
 // Update employee by ID
 export const UPDATE_EMP_BY_ID = `
   UPDATE Employees
@@ -152,24 +152,24 @@ export const UPDATE_EMP_BY_ID = `
   WHERE
     id = ?
 `;
- 
+
 // Delete employee by ID
 export const DELETE_EMP_BY_ID = "DELETE FROM employees WHERE id = ?";
- 
+
 // Check if employee already exists or not by email
 export const CHECK_EMP = "SELECT * FROM Employees WHERE email = ?";
- 
+
 /* =========================
    EMPLOYEE ↔ TASK QUERIES
 ========================= */
- 
+
 // Assign task to employee
 export const ASSIGN_TASK_TO_EMPLOYEE = `
   INSERT INTO employee_task
   (employeeId, taskId, status, poc, createdBy, updatedBy)
   VALUES (?, ?, ?, ?, ?, ?)
 `;
- 
+
 // Fetch all tasks of an employee
 export const FETCH_TASKS_BY_EMPLOYEE = `
   SELECT t.*, et.status, et.poc, et.dueDate
@@ -177,7 +177,7 @@ export const FETCH_TASKS_BY_EMPLOYEE = `
   JOIN employee_task et ON t.id = et.taskId
   WHERE et.employeeId = ?
 `;
- 
+
 // Update employee-task mapping
 export const UPDATE_EMPLOYEE_TASK = `
   UPDATE employee_task
@@ -186,37 +186,30 @@ export const UPDATE_EMPLOYEE_TASK = `
     poc = ?
   WHERE id = ?
 `;
- 
+
 // Remove task from employee
 export const DELETE_EMPLOYEE_TASK = `
   DELETE FROM employee_task WHERE id = ?
 `;
- 
+
 // Get employee list 
-export const GET_TEAM_LIST= `SELECT *
+export const GET_TEAM_LIST = `SELECT team.Name as teamName, *
 FROM TEAMS AS TEAM
 INNER JOIN EMPLOYEES AS EMP
   ON TEAM.ID = EMP.TEAMID
 INNER JOIN EMPLOYEE_TASK AS EMPTSK
   ON EMP.ID = EMPTSK.EMPLOYEEID`;
 
-export const GET_TEAM_DETAILS = `SELECT 
-    employees.id AS id,
-    employees.name AS name,
-    employeeTask.status AS status,
-    teams.name as TeamName,
-    tasks.name as TaskName
-FROM EMPLOYEES employees
-JOIN EMPLOYEE_TASK employeeTask 
-ON employees.id = employeeTask.employeeId
-JOIN TEAMS teams
-ON teams.id = employees.teamId
-JOIN TASKS tasks
-ON  tasks.id = employees.id
-WHERE employees.teamId = ?`;
+export const GET_TEAM_DETAILS = `SELECT team.Name as teamName, *
+FROM TEAMS AS TEAM
+INNER JOIN EMPLOYEES AS EMP
+  ON TEAM.ID = EMP.TEAMID
+INNER JOIN EMPLOYEE_TASK AS EMPTSK
+  ON EMP.ID = EMPTSK.EMPLOYEEID
+  where emp.teamId = ?`;
 
 
-export  const CREATE_EMPLOYEE_TASK = `INSERT INTO employee_task ( employeeid, taskid, status, poc, createdby, updatedby, createdOn, updatedOn )
+export const CREATE_EMPLOYEE_TASK = `INSERT INTO employee_task ( employeeid, taskid, status, poc, createdby, updatedby, createdOn, updatedOn )
  VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING *`;
 
 export const CHECK_EMPLOYEE = `SELECT * FROM EMPLOYEE_TASK WHERE EMPLOYEEID = ? `;
@@ -232,7 +225,7 @@ export const FETCH_EMPLOYEE_TASK_DETAIL = `
   JOIN EMPLOYEE_TASK ET ON T.id = ET.taskId
   WHERE ET.employeeId = ? AND ET.taskId = ?
 `;
- 
+
 // Add comment to an employee task
 export const ADD_COMMENT_TO_TASK = `
   INSERT INTO TASK_COMMENTS (comment, employeetaskId, createdBy, updatedBy, createdOn, updatedOn)

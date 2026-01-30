@@ -53,8 +53,7 @@ router.get('/team/:id', async (req: Request, res: Response) => {
 
 router.put('/addTask', async (req: Request, res: Response) => {
     const { taskId, employeeId, status, poc } = req.body;
-   console.log(req.body);
-    if (!taskId || !employeeId || !status || !poc ) {
+       if (!taskId || !employeeId || !status || !poc ) {
         return send400(res, req.path, [{
             fieldName: 'taskId, employeeId, status, poc',
             type: 'bad-request',

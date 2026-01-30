@@ -51,8 +51,8 @@ router.get('/team/:id', async (req: Request, res: Response) => {
     }
 });
 
-router.put('/addTask', async (req: Request, res: Response) => {
-    const { taskId, employeeId, status, poc } = req.body;
+router.post('/addTask', async (req: Request, res: Response) => {
+    const { taskId, employeeId, status, poc, dueDate } = req.body;
    console.log(req.body);
     if (!taskId || !employeeId || !status || !poc ) {
         return send400(res, req.path, [{

@@ -37,6 +37,7 @@ export class ManagerRepository {
             employeeTaskData.taskId ?? null,
             employeeTaskData.status,
             employeeTaskData.poc,
+            employeeTaskData.dueDate,
             employeeTaskData.createdBy ?? null,
             employeeTaskData.updatedBy ?? null,
             employeeTaskData.createdOn ?? new Date().toISOString(),

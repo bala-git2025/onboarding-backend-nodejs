@@ -3,14 +3,27 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { send200, send201, send401, send500 } from '../arch-layer/response/reponse';
 import { UserRepository } from '../repositories/userRepository';
-import { EmployeeRepository } from '../repositories/employeeRepository';
-import { User } from '../models/userModel';
-import { Employee } from '../models/employeeModel';
+import { ResponsePayload, User, AuthUser } from '../models/userModel';
 
 const router = Router();
 const userRepo = new UserRepository();
-const employeeRepo = new EmployeeRepository();
 const SECRET_KEY = process.env.JWT_SECRET || 'super_secret_key';
+
+/* ------------------ Middleware to verify JWT ------------------ */
+const authenticate = (req: any, res: any, next: any) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return send401(res, req.path, new Error('No token provided'));
+
+  const token = authHeader.split(' ')[1];
+  try {
+    const decoded = jwt.verify(token, SECRET_KEY) as AuthUser;
+    // Store the decoded user in res.locals instead of req.user
+    res.locals.authUser = decoded;
+    next();
+  } catch (err) {
+    return send401(res, req.path, new Error('Invalid token'));
+  }
+};
 
 /**
  * POST /auth/login
@@ -29,31 +42,21 @@ router.post('/login', async (req, res) => {
       return send401(res, req.path, new Error('User account is not associated with an employee.'));
     }
 
-        // Compare hashed password
+    // Compare hashed password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return send401(res, req.path, new Error('Invalid credentials'));
-    }
-
-    const employee: Employee | null = await employeeRepo.getEmployeeById(user.employeeId);
-
-    if (!employee) {
-      return send500(res, req.path, new Error('Associated employee record not found.'));
+      return send401(res, req.path, new Error('Invalid Username & Password'));
     }
 
     // Generate JWT
-    const token = jwt.sign(
-      { id: user.id, role: user.role },
-      SECRET_KEY,
-      { expiresIn: '1h' }
-    );
+    const token = jwt.sign({ id: user.id, role: user.role }, SECRET_KEY, { expiresIn: '1h' });
 
-    const responsePayload = {
+    const responsePayload: ResponsePayload = {
       token,
       role: user.role,
       userName: user.userName,
       employeeId: user.employeeId,
-      employeeName: employee.name
+      employeeName: user.employeeName
     };
 
     send200(res, req.path, responsePayload);
@@ -91,6 +94,48 @@ router.post('/register', async (req, res) => {
         roleId: newUser.roleId,
       },
     });
+  } catch (err) {
+    send500(res, req.path, err as Error);
+  }
+});
+
+/**
+ * GET /auth/profile
+ */
+router.get('/profile', authenticate, async (req, res) => {
+  try {
+    const authUser = res.locals.authUser as AuthUser;
+    const user = await userRepo.findById(authUser.id);
+    if (!user || !user.employeeId) {
+      return send401(res, req.path, new Error('User not found'));
+    }
+
+    const profile = await userRepo.getProfile(user.employeeId);
+    if (!profile) {
+      return send500(res, req.path, new Error('Profile not found'));
+    }
+
+    send200(res, req.path, profile);
+  } catch (err) {
+    send500(res, req.path, err as Error);
+  }
+});
+
+/**
+ * PUT /auth/profile
+ */
+router.put('/profile', authenticate, async (req, res) => {
+  try {
+    const authUser = res.locals.authUser as AuthUser;
+    const user = await userRepo.findById(authUser.id);
+    if (!user || !user.employeeId) {
+      return send401(res, req.path, new Error('User not found'));
+    }
+
+    const { email, phone, primarySkill } = req.body;
+    const updated = await userRepo.updateProfile(user.employeeId, { email, phone, primarySkill });
+
+    send200(res, req.path, updated);
   } catch (err) {
     send500(res, req.path, err as Error);
   }

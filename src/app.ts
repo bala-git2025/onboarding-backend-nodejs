@@ -27,7 +27,7 @@ app.use('/health', healthController);
 app.use('/employees', authenticateJWT, employeeController, employeeTaskController); 
 app.use('/tasks', authenticateJWT, taskController, taskEmployeeController); 
 app.use('/taskComments', authenticateJWT, taskCommentsController);
-app.use('/manager', authenticateJWT, managerController);
+app.use('/manager', managerController);
 
 const log: any = logger;
 log.table = (data: any, msg?: string) => {

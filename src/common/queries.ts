@@ -266,7 +266,7 @@ export const DELETE_EMPLOYEE_TASK = "DELETE FROM Employee_Task WHERE id = ?";
 
 // Get team list
 export const GET_TEAM_LIST = `
-  SELECT *
+  SELECT *, team.Name as teamName
   FROM Teams AS TEAM
   INNER JOIN Employees AS EMP ON TEAM.id = EMP.teamId
   INNER JOIN Employee_Task AS EMPTSK ON EMP.id = EMPTSK.employeeId
@@ -274,17 +274,13 @@ export const GET_TEAM_LIST = `
 
 // Get team details
 export const GET_TEAM_DETAILS = `
-  SELECT 
-    employees.id AS id,
-    employees.name AS name,
-    employeeTask.status AS status,
-    teams.name as TeamName,
-    tasks.name as TaskName
-  FROM Employees employees
-  JOIN Employee_Task employeeTask ON employees.id = employeeTask.employeeId
-  JOIN Teams teams ON teams.id = employees.teamId
-  JOIN Tasks tasks ON tasks.id = employees.id
-  WHERE employees.teamId = ?
+  SELECT  *
+FROM TEAMS AS TEAM
+INNER JOIN EMPLOYEES AS EMP
+  ON TEAM.ID = EMP.TEAMID
+INNER JOIN EMPLOYEE_TASK AS EMPTSK
+  ON EMP.ID = EMPTSK.EMPLOYEEID
+  where emp.teamId = ?
 `;
 
 export const CREATE_EMPLOYEE_TASK = `

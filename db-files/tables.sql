@@ -1,5 +1,3 @@
-PRAGMA foreign_keys = ON;
-
 -- Role Table
 CREATE TABLE ROLE (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -28,8 +26,8 @@ CREATE TABLE EMPLOYEES (
     name TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
     phone TEXT,
-    joiningDate DATE,
-    primarySkill TEXT,
+    joiningDate DATE NOT NULL,
+    primarySkill TEXT NOT NULL,
     createdBy TEXT,
     updatedBy TEXT,
     createdOn DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -71,6 +69,7 @@ CREATE TABLE EMPLOYEE_TASK (
     taskId INTEGER,
     status TEXT,
     POC TEXT,
+    dueDate DATE,
     createdBy TEXT,
     updatedBy TEXT,
     createdOn DATETIME DEFAULT CURRENT_TIMESTAMP,

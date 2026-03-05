@@ -19,6 +19,9 @@ export class DBManager {
       await this.postgres.checkDbConnection();
     } else if (this.sqlite) {
       await this.sqlite.connect();
+      // SQLite Locking Fixes
+      await this.sqlite.executeWrite('PRAGMA journal_mode = WAL;', []);
+      await this.sqlite.executeWrite('PRAGMA busy_timeout = 5000;', []);
     }
   }
 
@@ -32,25 +35,25 @@ export class DBManager {
 
   public async query<T>(sql: string, params: any[] = []): Promise<T[]> {
     if (this.postgres) {
-      return this.postgres.executeReadQuery<T>(sql, params);
+      return this.postgres.executeReadQuery(sql, params);
     } else if (this.sqlite) {
-      return this.sqlite.executeQuery<T>(sql, params);
+      return this.sqlite.executeQuery(sql, params);
     }
     throw new Error('No database configured');
   }
 
   public async write<T>(sql: string, params: any[] = []): Promise<T[]> {
     if (this.postgres) {
-      return this.postgres.executeWriteQuery<T>(sql, params);
+      return this.postgres.executeWriteQuery(sql, params);
     } else if (this.sqlite) {
-      return this.sqlite.executeWrite<T>(sql, params);
+      return this.sqlite.executeWrite(sql, params);
     }
     throw new Error('No database configured');
   }
 
- public async excuteWriteReturn<T>(sql: string, params: any[] = []): Promise<T[]> {
+  public async excuteWriteReturn<T>(sql: string, params: any[] = []): Promise<T[]> {
     if(this.sqlite) {
-      return this.sqlite.excuteWriteReturning<T>(sql, params);
+      return this.sqlite.excuteWriteReturning(sql, params);
     }
     throw new Error('No database configured');
   }

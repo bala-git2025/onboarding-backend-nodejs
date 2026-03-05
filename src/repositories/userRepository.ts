@@ -90,23 +90,52 @@ export class UserRepository {
     return result.length > 0 ? result[0] : null;
   }
 
-  /**
+    /**
    * Update employee profile fields (email, phone, primarySkill)
    */
-  async updateProfile(
-    employeeId: number,
-    updates: { email?: string; phone?: string; primarySkill?: string },
-  ): Promise<User> {
+  async updateProfile(employeeId: number, updates: any): Promise<User> {
     await dbManager.connect();
     const now = new Date().toISOString();
-    const result = await dbManager.write<User>(UserQueries.updateUserProfile, [
-      updates.email,
-      updates.phone,
-      updates.primarySkill,
-      "system",
-      now,
-      employeeId,
-    ]);
-    return result[0];
+
+    const fieldsToUpdate = Object.keys(updates).filter(
+      (key) => updates[key] !== undefined
+    );
+
+    if (fieldsToUpdate.length === 0) {
+      const profile = await this.getProfile(employeeId);
+      if (!profile) throw new Error("Profile not found");
+      return profile;
+    }
+
+    fieldsToUpdate.push("updatedBy", "updatedOn");
+
+    const values = fieldsToUpdate.map((key) => {
+      if (key === "updatedBy") return "system";
+      if (key === "updatedOn") return now;
+      return updates[key];
+    });
+
+    values.push(employeeId);
+
+    const setClause = fieldsToUpdate.map((key) => `${key} = ?`).join(", ");
+    const sql = `UPDATE EMPLOYEES SET ${setClause} WHERE id = ?`;
+
+    await dbManager.write(sql, values);
+
+    try {
+      const updatedProfile = await this.getProfile(employeeId);
+      if (updatedProfile) {
+        return updatedProfile;
+      }
+    } catch (fetchError) {
+      console.error("Failed to fetch profile after update (but update succeeded):", fetchError);
+    }
+
+    const basicProfile = await this.getProfile(employeeId); 
+    if (!basicProfile) {
+         throw new Error("Profile saved, but failed to retrieve updated view. Please refresh the page.");
+    }
+    
+    return basicProfile;
   }
 }

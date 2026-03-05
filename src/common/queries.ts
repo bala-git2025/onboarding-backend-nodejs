@@ -49,6 +49,7 @@ export const UserQueries = {
       e.email,
       e.phone,
       e.primarySkill,
+      e.profilePicture,
       e.joiningDate,
       e.updatedOn AS lastUpdated,
       t.name AS teamName

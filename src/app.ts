@@ -19,7 +19,9 @@ const app = express();
 // Middleware: parse JSON
 app.use(express.json());
 
-app.use(cors({ origin: "http://localhost:4000",  credentials: true }));
+app.use(cors({ origin: "http://localhost:4000", credentials: true }));
+
+app.use('/uploads', express.static('uploads'));
 
 // Register controllers
 app.use('/auth', authController);

@@ -14,20 +14,20 @@ export interface User {
   role: string;
   employeeId?: number;
   employeeName?: string;
-
   email?: string;
   phone?: string;
   primarySkill?: string;
   teamName?: string;
   joiningDate?: string;
   lastUpdated?: string;
+  profilePicture?: string;
 }
 
-
-export interface ResponsePayload{
-      token: string;
-      role: string;
-      userName: string;
-      employeeId: number;
-      employeeName?: string;
+export interface ResponsePayload {
+  token: string;
+  role: string;
+  userName: string;
+  employeeId: number;
+  employeeName?: string;
+  profilePicture?: string;
 }

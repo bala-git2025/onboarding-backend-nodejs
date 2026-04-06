@@ -245,7 +245,15 @@ export const ASSIGN_TASK_TO_EMPLOYEE = `
 
 // Fetch all tasks of an employee
 export const FETCH_TASKS_BY_EMPLOYEE = `
-  SELECT t.*, et.status, et.POC, et.dueDate
+  SELECT 
+    t.id as id,
+    t.name,
+    t.description,
+    t.createdOn,
+    et.status,
+    et.POC,
+    et.dueDate,
+    et.id as employeeTaskId
   FROM Tasks t
   JOIN Employee_Task et ON t.id = et.taskId
   WHERE et.employeeId = ?
@@ -296,13 +304,17 @@ export const CHECK_EMPLOYEE =
   "SELECT * FROM Employee_Task WHERE employeeId = ?";
 
 // Fetch specific task detail for an employee
+// FIX: Explicitly select columns
 export const FETCH_EMPLOYEE_TASK_DETAIL = `
   SELECT 
-    T.*, 
-    ET.status, 
-    ET.POC, 
-    ET.id as employeeTaskId,
-    ET.dueDate
+    T.id,
+    T.name,
+    T.description,
+    T.createdOn,
+    ET.status,
+    ET.POC,
+    ET.dueDate,
+    ET.id as employeeTaskId
   FROM Tasks T
   JOIN Employee_Task ET ON T.id = ET.taskId
   WHERE ET.employeeId = ? AND ET.taskId = ?

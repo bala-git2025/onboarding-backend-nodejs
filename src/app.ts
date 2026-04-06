@@ -26,10 +26,10 @@ app.use('/uploads', express.static('uploads'));
 // Register controllers
 app.use('/auth', authController);
 app.use('/health', healthController);
-app.use('/employees', authenticateJWT, employeeController, employeeTaskController); 
+app.use('/employees', authenticateJWT, employeeTaskController, employeeController); 
 app.use('/tasks', authenticateJWT, taskController, taskEmployeeController); 
 app.use('/taskComments', authenticateJWT, taskCommentsController);
-app.use('/manager', authenticateJWT,managerController);
+app.use('/manager', authenticateJWT, managerController);
 
 const log: any = logger;
 log.table = (data: any, msg?: string) => {
